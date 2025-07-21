@@ -22,3 +22,9 @@ body.dark {
   background: #0b141a;
   color: white;
 }
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+.icono-interactivo {
+  @apply transition duration-150 ease-in-out hover:scale-110 active:scale-125 select-none;
+}
