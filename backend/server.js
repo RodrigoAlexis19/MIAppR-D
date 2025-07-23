@@ -14,7 +14,12 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Rutas
+// Ruta raíz para Render (mensaje simple)
+app.get('/', (req, res) => {
+  res.send('Servidor backend corriendo correctamente 🟢');
+});
+
+// Rutas API
 app.use('/api', authRoutes);
 
 // Conexión a MongoDB
@@ -25,3 +30,4 @@ mongoose
     app.listen(PORT, () => console.log(`🚀 Servidor corriendo en puerto ${PORT}`));
   })
   .catch((err) => console.error('❌ Error al conectar MongoDB:', err));
+
