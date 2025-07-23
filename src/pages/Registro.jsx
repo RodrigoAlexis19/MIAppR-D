@@ -16,7 +16,7 @@ function Registro() {
     e.preventDefault(); // Evita recargar la página
 
     try {
-      const res = await fetch('http://localhost:5000/api/registro', {
+      const res = await fetch('https://miappr-d.onrender.com/api/registro', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
