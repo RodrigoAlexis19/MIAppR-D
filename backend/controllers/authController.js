@@ -7,11 +7,23 @@ const esContraseñaSegura = (pwd) => {
   return regex.test(pwd);
 };
 
+// Validar formato de correo electrónico
+const esCorreoValido = (correo) => {
+  const regex = /^[\w-.]+@gmail\.com$/i;
+  return regex.test(correo);
+};
+
 // Controlador para registrar nuevo usuario
 const registrarUsuario = async (req, res) => {
-  const { username, email, password } = req.body;
+  let { username, email, password } = req.body;
 
   try {
+    if (!email || !esCorreoValido(email.trim())) {
+      return res.status(400).json({ mensaje: 'Solo se permiten correos válidos de gmail.com' });
+    }
+
+    email = email.toLowerCase().trim();
+
     const existe = await User.findOne({ email });
     if (existe) {
       return res.status(400).json({ mensaje: 'El correo ya está registrado' });
@@ -75,7 +87,7 @@ const recuperarContraseña = async (req, res) => {
   }
 
   try {
-    const usuario = await User.findOne({ email });
+    const usuario = await User.findOne({ email: email.toLowerCase().trim() });
 
     // Siempre respondemos igual para evitar revelar si el usuario existe o no
     if (!usuario) {
