@@ -8,6 +8,7 @@ import PerfilElla from './pages/PerfilElla';
 import MiEspacio from './pages/MiEspacio';
 import Finanzas from './pages/Finanzas';
 import Tareas from './pages/Tareas';
+import Recuperar from './pages/Recuperar';
 
 function AppRoutes() {
   return (
@@ -23,6 +24,7 @@ function AppRoutes() {
       <Route path="/miespacio" element={<MiEspacio />} />
       <Route path="/finanzas" element={<Finanzas />} />
       <Route path="/tareas" element={<Tareas />} />
+      <Route path="/recuperar" element={<Recuperar />} />
     </Routes>
   );
 }
