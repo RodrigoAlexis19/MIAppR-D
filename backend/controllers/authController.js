@@ -1,11 +1,11 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
+// Registro de usuario
 const register = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    // Validación de existencia previa
     const emailExistente = await User.findOne({ email });
     const usernameExistente = await User.findOne({ username });
 
@@ -15,14 +15,12 @@ const register = async (req, res) => {
       });
     }
 
-    // Hashear la contraseña
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Crear nuevo usuario
     const nuevoUsuario = new User({
       username,
-      email,
+      email: email.toLowerCase().trim(),
       password: hashedPassword
     });
 
@@ -35,11 +33,11 @@ const register = async (req, res) => {
   }
 };
 
+// Login de usuario
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Buscar por correo o nombre de usuario (ignorando mayúsculas)
     const user = await User.findOne({
       $or: [
         { email: email.toLowerCase() },
@@ -57,8 +55,7 @@ const login = async (req, res) => {
       return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
 
-    // 🔄 Se devuelve también el username y el email
-    return res.status(200).json({
+    res.status(200).json({
       mensaje: 'Login exitoso',
       username: user.username,
       email: user.email
@@ -70,6 +67,39 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { register, login };
+// Recuperación de contraseña
+const recuperarContraseña = async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ mensaje: 'Debes ingresar un correo electrónico' });
+  }
+
+  try {
+    const usuario = await User.findOne({ email: email.toLowerCase().trim() });
+
+    if (!usuario) {
+      return res.status(200).json({ mensaje: '📧 Si el correo está registrado, recibirás un enlace para recuperar tu contraseña.' });
+    }
+
+    // Aquí puedes conectar a tu servicio de correo real
+    console.log(`Simulando recuperación de contraseña para: ${email}`);
+
+    return res.status(200).json({
+      mensaje: '📧 Si el correo está registrado, recibirás un enlace para recuperar tu contraseña.'
+    });
+
+  } catch (error) {
+    console.error('Error en recuperación de contraseña:', error);
+    res.status(500).json({ mensaje: 'Error del servidor en recuperación de contraseña' });
+  }
+};
+
+module.exports = {
+  register,
+  login,
+  recuperarContraseña
+};
+
 
 
