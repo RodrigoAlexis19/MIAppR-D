@@ -29,12 +29,10 @@ const registrarUsuario = async (req, res) => {
       return res.status(400).json({ mensaje: 'El correo ya está registrado' });
     }
 
-    // Validar contraseña fuerte
     if (!esContraseñaSegura(password)) {
       return res.status(400).json({ mensaje: 'Contraseña insegura. Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.' });
     }
 
-    // Hashear la contraseña antes de guardar
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const nuevoUsuario = new User({
@@ -52,7 +50,7 @@ const registrarUsuario = async (req, res) => {
   }
 };
 
-// Controlador para iniciar sesión con usuario o correo
+// Controlador para iniciar sesión
 const iniciarSesion = async (req, res) => {
   const { email, password } = req.body;
 
@@ -71,7 +69,8 @@ const iniciarSesion = async (req, res) => {
       return res.status(400).json({ mensaje: 'Contraseña incorrecta' });
     }
 
-    res.status(200).json({ mensaje: 'Inicio de sesión exitoso' });
+    // Enviamos el correo del usuario en la respuesta
+    return res.status(200).json({ mensaje: 'Inicio de sesión exitoso', correo: usuario.email });
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
     res.status(500).json({ mensaje: 'Error interno del servidor' });
@@ -89,12 +88,10 @@ const recuperarContraseña = async (req, res) => {
   try {
     const usuario = await User.findOne({ email: email.toLowerCase().trim() });
 
-    // Siempre respondemos igual para evitar revelar si el usuario existe o no
     if (!usuario) {
       return res.status(200).json({ mensaje: '📧 Si el correo está registrado, recibirás un enlace para recuperar tu contraseña.' });
     }
 
-    // Aquí podrías generar y guardar un token de recuperación temporal
     console.log(`Simulando recuperación para ${email}`);
 
     res.status(200).json({ mensaje: '📧 Si el correo está registrado, recibirás un enlace para recuperar tu contraseña.' });
