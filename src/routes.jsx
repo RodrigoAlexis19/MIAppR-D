@@ -4,6 +4,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
 import MenuCompartido from './pages/MenuCompartido';
+import MenuRodrigo from './pages/MenuRodrigo'; // ✅ Agregado
 import PerfilElla from './pages/PerfilElla';
 import MiEspacio from './pages/MiEspacio';
 import Finanzas from './pages/Finanzas';
@@ -20,6 +21,7 @@ function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/registro" element={<Registro />} />
       <Route path="/menu" element={<MenuCompartido />} />
+      <Route path="/menu-rodrigo" element={<MenuRodrigo />} /> {/* ✅ Nueva ruta */}
       <Route path="/ella" element={<PerfilElla />} />
       <Route path="/miespacio" element={<MiEspacio />} />
       <Route path="/finanzas" element={<Finanzas />} />
@@ -30,4 +32,5 @@ function AppRoutes() {
 }
 
 export default AppRoutes;
+
 

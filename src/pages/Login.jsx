@@ -24,7 +24,21 @@ function Login() {
 
       if (res.ok) {
         setMensaje('✅ Inicio de sesión exitoso');
-        setTimeout(() => navigate('/menu'), 1500);
+
+        // Convertir a minúsculas por si viene como correo
+        const correoIngresado = email.toLowerCase().trim();
+
+        // Si coincide con tu correo, redirige a tu menú personalizado
+        setTimeout(() => {
+          if (
+            correoIngresado === 'rodrigojara354@gmail.com' ||
+            data?.email?.toLowerCase() === 'rodrigojara354@gmail.com'
+          ) {
+            navigate('/menu-rodrigo');
+          } else {
+            navigate('/menu');
+          }
+        }, 1500);
       } else {
         setMensaje(`❌ ${data.mensaje}`);
       }
@@ -40,6 +54,7 @@ function Login() {
         ? 'bg-[#0c111d] text-[#d1d5db]'
         : 'bg-gradient-to-br from-[#7a32ff] to-[#3bc8eb] text-gray-900'
     }`}>
+      {/* Botón de cambio de tema */}
       <button
         onClick={toggleTheme}
         className="absolute top-4 right-4 text-2xl bg-white/10 dark:bg-white/10 backdrop-blur-md p-2 rounded-full hover:scale-110 transition"
@@ -80,7 +95,6 @@ function Login() {
                 : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
             } focus:outline-none focus:ring-2`}
           />
-
           <button
             type="submit"
             className="w-full py-2 rounded-lg font-semibold transition hover:scale-105 shadow-md bg-gradient-to-r from-[#3b82f6] to-[#22d3ee] text-white"
@@ -94,7 +108,7 @@ function Login() {
           <p className="mt-4 text-center text-sm font-medium">{mensaje}</p>
         )}
 
-        {/* 🔄 Recuperar acceso + Registro */}
+        {/* Recuperación y Registro */}
         <div className="mt-4 text-center text-sm flex flex-col sm:flex-row sm:justify-center sm:gap-2 items-center">
           <button
             onClick={() => navigate('/recuperar')}
