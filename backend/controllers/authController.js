@@ -1,109 +1,75 @@
 const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 
-// Validar contraseña segura
-const esContraseñaSegura = (pwd) => {
-  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
-  return regex.test(pwd);
-};
-
-// Validar formato de correo electrónico
-const esCorreoValido = (correo) => {
-  const regex = /^[\w-.]+@gmail\.com$/i;
-  return regex.test(correo);
-};
-
-// Controlador para registrar nuevo usuario
-const registrarUsuario = async (req, res) => {
-  let { username, email, password } = req.body;
-
+const register = async (req, res) => {
   try {
-    if (!email || !esCorreoValido(email.trim())) {
-      return res.status(400).json({ mensaje: 'Solo se permiten correos válidos de gmail.com' });
+    const { username, email, password } = req.body;
+
+    // Validación de existencia previa
+    const emailExistente = await User.findOne({ email });
+    const usernameExistente = await User.findOne({ username });
+
+    if (emailExistente || usernameExistente) {
+      return res.status(400).json({
+        mensaje: 'El correo o nombre de usuario ya está registrado'
+      });
     }
 
-    email = email.toLowerCase().trim();
+    // Hashear la contraseña
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
-    const existe = await User.findOne({ email });
-    if (existe) {
-      return res.status(400).json({ mensaje: 'El correo ya está registrado' });
-    }
-
-    if (!esContraseñaSegura(password)) {
-      return res.status(400).json({ mensaje: 'Contraseña insegura. Debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo.' });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
+    // Crear nuevo usuario
     const nuevoUsuario = new User({
       username,
       email,
-      password: hashedPassword,
+      password: hashedPassword
     });
 
     await nuevoUsuario.save();
 
     res.status(201).json({ mensaje: 'Usuario registrado correctamente' });
   } catch (error) {
-    console.error('Error al registrar usuario:', error);
-    res.status(500).json({ mensaje: 'Error interno del servidor' });
+    console.error('Error en el registro:', error);
+    res.status(500).json({ mensaje: 'Error en el servidor' });
   }
 };
 
-// Controlador para iniciar sesión
-const iniciarSesion = async (req, res) => {
-  const { email, password } = req.body;
-
+const login = async (req, res) => {
   try {
-    const criterio = email.includes('@')
-      ? { email: email.toLowerCase() }
-      : { username: email };
+    const { email, password } = req.body;
 
-    const usuario = await User.findOne(criterio);
-    if (!usuario) {
+    // Buscar por correo o nombre de usuario (ignorando mayúsculas)
+    const user = await User.findOne({
+      $or: [
+        { email: email.toLowerCase() },
+        { username: email.toLowerCase() }
+      ]
+    });
+
+    if (!user) {
       return res.status(404).json({ mensaje: 'Usuario no encontrado' });
     }
 
-    const passwordValida = await bcrypt.compare(password, usuario.password);
-    if (!passwordValida) {
-      return res.status(400).json({ mensaje: 'Contraseña incorrecta' });
+    const validPassword = await bcrypt.compare(password, user.password);
+
+    if (!validPassword) {
+      return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
 
-    // Enviamos el correo del usuario en la respuesta
-    return res.status(200).json({ mensaje: 'Inicio de sesión exitoso', correo: usuario.email });
+    // 🔄 Se devuelve también el username y el email
+    return res.status(200).json({
+      mensaje: 'Login exitoso',
+      username: user.username,
+      email: user.email
+    });
+
   } catch (error) {
     console.error('Error al iniciar sesión:', error);
-    res.status(500).json({ mensaje: 'Error interno del servidor' });
+    res.status(500).json({ mensaje: 'Error en el servidor' });
   }
 };
 
-// Controlador para recuperación de contraseña
-const recuperarContraseña = async (req, res) => {
-  const { email } = req.body;
+module.exports = { register, login };
 
-  if (!email) {
-    return res.status(400).json({ mensaje: 'Debes ingresar un correo electrónico' });
-  }
-
-  try {
-    const usuario = await User.findOne({ email: email.toLowerCase().trim() });
-
-    if (!usuario) {
-      return res.status(200).json({ mensaje: '📧 Si el correo está registrado, recibirás un enlace para recuperar tu contraseña.' });
-    }
-
-    console.log(`Simulando recuperación para ${email}`);
-
-    res.status(200).json({ mensaje: '📧 Si el correo está registrado, recibirás un enlace para recuperar tu contraseña.' });
-  } catch (error) {
-    console.error('Error en recuperación de contraseña:', error);
-    res.status(500).json({ mensaje: 'Error del servidor en recuperación de contraseña' });
-  }
-};
-
-module.exports = {
-  registrarUsuario,
-  iniciarSesion,
-  recuperarContraseña
-};
 

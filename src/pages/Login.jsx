@@ -17,7 +17,7 @@ function Login() {
       const res = await fetch('https://miappr-d.onrender.com/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -25,16 +25,14 @@ function Login() {
       if (res.ok) {
         setMensaje('✅ Inicio de sesión exitoso');
 
-        // Convertir a minúsculas por si viene como correo
-        const correoIngresado = email.toLowerCase().trim();
+        const nombre = data.username?.toLowerCase().trim();
+        const correo = data.email?.toLowerCase().trim();
 
-        // Si coincide con tu correo, redirige a tu menú personalizado
         setTimeout(() => {
-          if (
-            correoIngresado === 'rodrigojara354@gmail.com' ||
-            data?.email?.toLowerCase() === 'rodrigojara354@gmail.com'
-          ) {
+          if (nombre === 'rodrigoalexis' || correo === 'rodrigojara354@gmail.com') {
             navigate('/menu-rodrigo');
+          } else if (nombre === 'ella' || correo === 'ella@gmail.com') {
+            navigate('/menu-ella');
           } else {
             navigate('/menu');
           }
@@ -49,12 +47,13 @@ function Login() {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center relative transition duration-300 ${
-      theme === 'dark'
-        ? 'bg-[#0c111d] text-[#d1d5db]'
-        : 'bg-gradient-to-br from-[#7a32ff] to-[#3bc8eb] text-gray-900'
-    }`}>
-      {/* Botón de cambio de tema */}
+    <div
+      className={`min-h-screen flex items-center justify-center relative transition duration-300 ${
+        theme === 'dark'
+          ? 'bg-[#0c111d] text-[#d1d5db]'
+          : 'bg-gradient-to-br from-[#7a32ff] to-[#3bc8eb] text-gray-900'
+      }`}
+    >
       <button
         onClick={toggleTheme}
         className="absolute top-4 right-4 text-2xl bg-white/10 dark:bg-white/10 backdrop-blur-md p-2 rounded-full hover:scale-110 transition"
@@ -63,12 +62,16 @@ function Login() {
         {theme === 'dark' ? '🌞' : '🌙'}
       </button>
 
-      <div className={`p-8 rounded-xl shadow-xl w-full max-w-sm mx-4 backdrop-blur-lg ${
-        theme === 'dark' ? 'bg-white/5' : 'bg-white/10'
-      }`}>
-        <h2 className={`text-2xl font-bold mb-6 text-center ${
-          theme === 'dark' ? 'text-[#e2b5ff]' : 'text-gray-900'
-        }`}>
+      <div
+        className={`p-8 rounded-xl shadow-xl w-full max-w-sm mx-4 backdrop-blur-lg ${
+          theme === 'dark' ? 'bg-white/5' : 'bg-white/10'
+        }`}
+      >
+        <h2
+          className={`text-2xl font-bold mb-6 text-center ${
+            theme === 'dark' ? 'text-[#e2b5ff]' : 'text-gray-900'
+          }`}
+        >
           Iniciar Sesión
         </h2>
 
@@ -95,6 +98,7 @@ function Login() {
                 : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
             } focus:outline-none focus:ring-2`}
           />
+
           <button
             type="submit"
             className="w-full py-2 rounded-lg font-semibold transition hover:scale-105 shadow-md bg-gradient-to-r from-[#3b82f6] to-[#22d3ee] text-white"
@@ -108,7 +112,6 @@ function Login() {
           <p className="mt-4 text-center text-sm font-medium">{mensaje}</p>
         )}
 
-        {/* Recuperación y Registro */}
         <div className="mt-4 text-center text-sm flex flex-col sm:flex-row sm:justify-center sm:gap-2 items-center">
           <button
             onClick={() => navigate('/recuperar')}
@@ -134,3 +137,4 @@ function Login() {
 }
 
 export default Login;
+
