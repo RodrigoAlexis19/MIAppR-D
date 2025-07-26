@@ -3,58 +3,21 @@ import { ThemeContext } from '../context/ThemeContext';
 import { useNavigate } from 'react-router-dom';
 
 function Registro() {
-  const { theme, toggleTheme } = useContext(ThemeContext);
+  const { theme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [repeatEmail, setRepeatEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
   const [mensaje, setMensaje] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
-  const contraseñaEsSegura = (pwd) => {
-    const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]).{8,}$/;
-    return regex.test(pwd);
-  };
-
-  const [validacion, setValidacion] = useState({
-    longitud: false,
-    mayuscula: false,
-    minuscula: false,
-    numero: false,
-    simbolo: false
-  });
-
-  const validarContraseñaEnTiempoReal = (pwd) => {
-    setValidacion({
-      longitud: pwd.length >= 8,
-      mayuscula: /[A-Z]/.test(pwd),
-      minuscula: /[a-z]/.test(pwd),
-      numero: /[0-9]/.test(pwd),
-      simbolo: /[!@#$%^&*(),.?":{}|<>]/.test(pwd)
-    });
-  };
-
-  const handlePasswordChange = (e) => {
-    const value = e.target.value;
-    setPassword(value);
-    validarContraseñaEnTiempoReal(value);
-  };
-
-  const handleSubmit = async (e) => {
+  const handleRegistro = async (e) => {
     e.preventDefault();
 
-    if (email !== repeatEmail) {
-      setMensaje('❌ Los correos no coinciden');
-      return;
-    }
     if (password !== repeatPassword) {
       setMensaje('❌ Las contraseñas no coinciden');
-      return;
-    }
-    if (!contraseñaEsSegura(password)) {
-      setMensaje('❌ La contraseña debe tener al menos 8 caracteres, una mayúscula, una minúscula, un número y un símbolo');
       return;
     }
 
@@ -62,47 +25,49 @@ function Registro() {
       const res = await fetch('https://miappr-d.onrender.com/api/registro', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
+        body: JSON.stringify({ username, email, password }),
       });
 
       const data = await res.json();
 
       if (res.ok) {
-        setMensaje('✅ Usuario registrado correctamente');
-        setTimeout(() => navigate('/login'), 1500);
+        setMensaje('✅ Registro exitoso, redirigiendo...');
+        setTimeout(() => navigate('/'), 2000);
       } else {
         setMensaje(`❌ ${data.mensaje}`);
       }
     } catch (error) {
-      console.error('Error en el registro:', error);
-      setMensaje('❌ Error al registrar. Intenta más tarde.');
+      console.error('Error al registrar:', error);
+      setMensaje('❌ Error al conectar con el servidor');
     }
   };
 
-  return (
-    <div className={`min-h-screen flex items-center justify-center relative transition duration-300 ${
-      theme === 'dark'
-        ? 'bg-[#0c111d] text-[#d1d5db]'
-        : 'bg-gradient-to-br from-[#7a32ff] to-[#3bc8eb] text-gray-900'
-    }`}>
-      <button
-        onClick={toggleTheme}
-        className="absolute top-4 right-4 text-2xl bg-white/10 dark:bg-white/10 backdrop-blur-md p-2 rounded-full hover:scale-110 transition"
-        aria-label="Cambiar tema"
-      >
-        {theme === 'dark' ? '🌞' : '🌙'}
-      </button>
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
 
-      <div className={`p-8 rounded-xl shadow-xl w-full max-w-sm mx-4 backdrop-blur-lg ${
-        theme === 'dark' ? 'bg-white/5' : 'bg-white/10'
-      }`}>
-        <h2 className={`text-2xl font-bold mb-6 text-center ${
-          theme === 'dark' ? 'text-[#e2b5ff]' : 'text-gray-900'
-        }`}>
+  return (
+    <div
+      className={`min-h-screen flex items-center justify-center transition duration-300 ${
+        theme === 'dark'
+          ? 'bg-[#0c111d] text-[#d1d5db]'
+          : 'bg-gradient-to-br from-[#7a32ff] to-[#3bc8eb] text-gray-900'
+      }`}
+    >
+      <div
+        className={`p-8 rounded-xl shadow-xl w-full max-w-sm mx-4 backdrop-blur-lg ${
+          theme === 'dark' ? 'bg-white/5' : 'bg-white/10'
+        }`}
+      >
+        <h2
+          className={`text-2xl font-bold mb-6 text-center ${
+            theme === 'dark' ? 'text-[#e2b5ff]' : 'text-gray-900'
+          }`}
+        >
           Crear Cuenta
         </h2>
 
-        <form className="space-y-4" onSubmit={handleSubmit}>
+        <form className="space-y-4" onSubmit={handleRegistro}>
           <input
             type="text"
             placeholder="Nombre de usuario"
@@ -125,46 +90,46 @@ function Registro() {
                 : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
             } focus:outline-none focus:ring-2`}
           />
-          <input
-            type="email"
-            placeholder="Repetir correo"
-            value={repeatEmail}
-            onChange={(e) => setRepeatEmail(e.target.value)}
-            className={`w-full px-4 py-2 rounded-lg ${
-              theme === 'dark'
-                ? 'bg-white/20 text-white placeholder-white/70 focus:ring-[#67e8f9]'
-                : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
-            } focus:outline-none focus:ring-2`}
-          />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={handlePasswordChange}
-            className={`w-full px-4 py-2 rounded-lg ${
-              theme === 'dark'
-                ? 'bg-white/20 text-white placeholder-white/70 focus:ring-[#67e8f9]'
-                : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
-            } focus:outline-none focus:ring-2`}
-          />
-          <ul className="text-xs space-y-1 pl-2">
-            <li className={validacion.longitud ? 'text-green-400' : 'text-red-400'}>• Mínimo 8 caracteres</li>
-            <li className={validacion.mayuscula ? 'text-green-400' : 'text-red-400'}>• Al menos una mayúscula</li>
-            <li className={validacion.minuscula ? 'text-green-400' : 'text-red-400'}>• Al menos una minúscula</li>
-            <li className={validacion.numero ? 'text-green-400' : 'text-red-400'}>• Al menos un número</li>
-            <li className={validacion.simbolo ? 'text-green-400' : 'text-red-400'}>• Al menos un símbolo</li>
-          </ul>
-          <input
-            type="password"
-            placeholder="Repetir contraseña"
-            value={repeatPassword}
-            onChange={(e) => setRepeatPassword(e.target.value)}
-            className={`w-full px-4 py-2 rounded-lg ${
-              theme === 'dark'
-                ? 'bg-white/20 text-white placeholder-white/70 focus:ring-[#67e8f9]'
-                : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
-            } focus:outline-none focus:ring-2`}
-          />
+
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Contraseña"
+              value={password}
+              onChange={handlePasswordChange}
+              className={`w-full px-4 py-2 rounded-lg pr-10 ${
+                theme === 'dark'
+                  ? 'bg-white/20 text-white placeholder-white/70 focus:ring-[#67e8f9]'
+                  : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
+              } focus:outline-none focus:ring-2`}
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-white/80 hover:text-white"
+            >
+              {showPassword ? '🙈' : '👁️'}
+            </span>
+          </div>
+
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Repetir contraseña"
+              value={repeatPassword}
+              onChange={(e) => setRepeatPassword(e.target.value)}
+              className={`w-full px-4 py-2 rounded-lg pr-10 ${
+                theme === 'dark'
+                  ? 'bg-white/20 text-white placeholder-white/70 focus:ring-[#67e8f9]'
+                  : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
+              } focus:outline-none focus:ring-2`}
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-white/80 hover:text-white"
+            >
+              {showPassword ? '🙈' : '👁️'}
+            </span>
+          </div>
 
           <button
             type="submit"
@@ -180,14 +145,13 @@ function Registro() {
         )}
 
         <div className="mt-4 text-center text-sm">
-          <p>¿Ya tienes una cuenta?</p>
           <button
-            onClick={() => navigate('/login')}
-            className={`mt-2 inline-block hover:underline ${
+            onClick={() => navigate('/')}
+            className={`hover:underline ${
               theme === 'dark' ? 'text-[#67e8f9]' : 'text-gray-900'
             }`}
           >
-            Iniciar sesión
+            ¿Ya tienes una cuenta? Iniciar sesión
           </button>
         </div>
       </div>

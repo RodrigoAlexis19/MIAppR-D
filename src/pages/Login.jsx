@@ -8,6 +8,7 @@ function Login() {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [mensaje, setMensaje] = useState('');
 
   const handleLogin = async (e) => {
@@ -25,13 +26,11 @@ function Login() {
       if (res.ok) {
         setMensaje('✅ Inicio de sesión exitoso');
 
-        const nombre = data.username?.toLowerCase().trim();
-        const correo = data.email?.toLowerCase().trim();
-
+        const destino = data.destino;
         setTimeout(() => {
-          if (nombre === 'rodrigoalexis' || correo === 'rodrigojara354@gmail.com') {
+          if (destino === 'MenuRodrigo') {
             navigate('/menu-rodrigo');
-          } else if (nombre === 'ella' || correo === 'ella@gmail.com') {
+          } else if (destino === 'MenuElla') {
             navigate('/menu-ella');
           } else {
             navigate('/menu');
@@ -87,17 +86,26 @@ function Login() {
                 : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
             } focus:outline-none focus:ring-2`}
           />
-          <input
-            type="password"
-            placeholder="Contraseña"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className={`w-full px-4 py-2 rounded-lg ${
-              theme === 'dark'
-                ? 'bg-white/20 text-white placeholder-white/70 focus:ring-[#67e8f9]'
-                : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
-            } focus:outline-none focus:ring-2`}
-          />
+
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Contraseña"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className={`w-full px-4 py-2 rounded-lg pr-10 ${
+                theme === 'dark'
+                  ? 'bg-white/20 text-white placeholder-white/70 focus:ring-[#67e8f9]'
+                  : 'bg-white/20 text-white placeholder-white/70 focus:ring-[#22d3ee]'
+              } focus:outline-none focus:ring-2`}
+            />
+            <span
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer text-white/80 hover:text-white"
+            >
+              {showPassword ? '🙈' : '👁️'}
+            </span>
+          </div>
 
           <button
             type="submit"

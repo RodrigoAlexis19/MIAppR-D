@@ -1,12 +1,14 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { ThemeContext } from '../context/ThemeContext'
 import ClockDual from '../components/ClockDual'
 import IconCard from '../components/IconCard'
+import ChatFlotante from '../components/ChatFlotante'
 import { Link, useNavigate } from 'react-router-dom'
 
 function MenuRodrigo() {
   const { theme, toggleTheme } = useContext(ThemeContext)
   const navigate = useNavigate()
+  const [mostrarChat, setMostrarChat] = useState(false)
 
   return (
     <div
@@ -90,11 +92,20 @@ function MenuRodrigo() {
           textColor={theme === 'dark' ? '#e2b5ff' : ''}
         />
       </div>
+
+      {/* Chat Flotante */}
+      <button
+        onClick={() => setMostrarChat(!mostrarChat)}
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-gradient-to-r from-[#38bdf8] to-[#1e40af] shadow-lg flex items-center justify-center text-white text-2xl hover:scale-110 active:scale-95 transition"
+      >
+        💬
+      </button>
+
+      {mostrarChat && <ChatFlotante onClose={() => setMostrarChat(false)} />}
     </div>
   )
 }
 
 export default MenuRodrigo;
-
 
 
